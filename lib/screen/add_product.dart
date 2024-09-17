@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:expiry_track/utils/palette.dart'; // Menggunakan Palette untuk warna yang konsisten
+import 'package:url_launcher/url_launcher.dart';
+import 'package:expiry_track/utils/palette.dart';
+import 'package:intl/intl.dart';
 
 class AddProduct extends StatefulWidget {
   @override
@@ -16,6 +18,7 @@ class _AddProductState extends State<AddProduct> {
     'Elektronik',
     'Obat Jamu'
   ];
+  TextEditingController _expirationDateController = TextEditingController();
 
   Future<void> _scanBarcode() async {
     try {
@@ -30,9 +33,40 @@ class _AddProductState extends State<AddProduct> {
       setState(() {
         barcode = scannedBarcode;
       });
+
+      if (barcode != "-1") {
+        // -1 adalah nilai yang dikembalikan jika pemindaian dibatalkan
+        _openProductDetails(barcode);
+      }
     } catch (e) {
       setState(() {
         barcode = 'Failed to get barcode';
+      });
+    }
+  }
+
+  Future<void> _openProductDetails(String barcode) async {
+    final url =
+        'https://www.google.com/search?q=$barcode'; // URL untuk pencarian Google
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Future<void> _selectExpirationDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2101),
+    );
+
+    if (picked != null && picked != DateTime.now()) {
+      setState(() {
+        _expirationDateController.text =
+            DateFormat('dd/MM/yyyy').format(picked);
       });
     }
   }
@@ -58,10 +92,14 @@ class _AddProductState extends State<AddProduct> {
               decoration: InputDecoration(
                 labelText: 'Nama Produk',
                 labelStyle: TextStyle(color: Palette.textSecondaryColor),
-                focusedBorder: UnderlineInputBorder(
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Palette.secondaryColor),
+                ),
+                focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Palette.primaryColor),
                 ),
               ),
+              cursorColor: Palette.primaryColor,
             ),
             SizedBox(height: 16),
             DropdownButtonFormField<String>(
@@ -69,6 +107,9 @@ class _AddProductState extends State<AddProduct> {
               decoration: InputDecoration(
                 labelText: 'Kategori',
                 labelStyle: TextStyle(color: Palette.textSecondaryColor),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Palette.secondaryColor),
+                ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: Palette.primaryColor),
                 ),
@@ -86,15 +127,22 @@ class _AddProductState extends State<AddProduct> {
               },
             ),
             SizedBox(height: 16),
-            TextField(
+            TextFormField(
+              controller: _expirationDateController,
+              readOnly: true,
               decoration: InputDecoration(
                 labelText: 'Tanggal Kadaluarsa',
                 labelStyle: TextStyle(color: Palette.textSecondaryColor),
-                focusedBorder: UnderlineInputBorder(
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Palette.secondaryColor),
+                ),
+                focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Palette.primaryColor),
                 ),
+                suffixIcon:
+                    Icon(Icons.calendar_today, color: Palette.primaryColor),
               ),
-              keyboardType: TextInputType.datetime,
+              onTap: () => _selectExpirationDate(context),
             ),
             SizedBox(height: 20),
             Center(

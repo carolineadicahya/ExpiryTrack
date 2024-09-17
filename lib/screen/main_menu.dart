@@ -19,8 +19,8 @@ class _HomePageState extends State<HomePage> {
 
     // Contoh event pada tanggal tertentu
     _events = {
-      DateTime.utc(2024, 9, 10): ['Produk A Kadaluarsa'],
-      DateTime.utc(2024, 9, 12): ['Produk B Kadaluarsa'],
+      DateTime.utc(2024, 9, 10): ['Produk 1 Kadaluarsa'],
+      DateTime.utc(2024, 9, 12): ['Produk 2 Kadaluarsa'],
     };
   }
 
@@ -32,13 +32,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ExpiryTrack'),
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-          color: Palette.textPrimaryColor,
+        title: Text(
+          'ExpiryTrack',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Palette.textPrimaryColor,
+          ),
         ),
+        centerTitle: true,
         backgroundColor: Palette.primaryColor,
         actions: [
           IconButton(
@@ -92,48 +94,75 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 8),
-            Flexible(
-              child: ListView.builder(
-                itemCount: _getEventsForDay(_selectedDay ?? _focusedDay).length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(
-                      _getEventsForDay(_selectedDay ?? _focusedDay)[index],
-                      style: TextStyle(color: Palette.textPrimaryColor),
+            Expanded(
+              child: ListView(
+                children: [
+                  // Daftar peringatan
+                  if (_getEventsForDay(_selectedDay ?? _focusedDay).isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Peringatan:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Palette.textPrimaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount:
+                              _getEventsForDay(_selectedDay ?? _focusedDay)
+                                  .length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Text(
+                                _getEventsForDay(
+                                    _selectedDay ?? _focusedDay)[index],
+                                style:
+                                    TextStyle(color: Palette.textPrimaryColor),
+                              ),
+                              leading: Icon(Icons.warning,
+                                  color: Palette.errorColor),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 40),
+                      ],
                     ),
-                    leading: Icon(Icons.warning, color: Palette.errorColor),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Produk Mendekati Kadaluarsa:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Palette.textPrimaryColor,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Flexible(
-              child: ListView.builder(
-                itemCount: 3, // Placeholder untuk jumlah produk
-                itemBuilder: (ctx, i) => Card(
-                  color: Palette.secondaryColor,
-                  child: ListTile(
-                    title: Text(
-                      'Produk ${i + 1}',
-                      style: TextStyle(color: Palette.textPrimaryColor),
+                  Text(
+                    'Produk Mendekati Kadaluarsa:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Palette.textPrimaryColor,
                     ),
-                    subtitle: Text(
-                      'Kadaluarsa: 2024-09-10',
-                      style: TextStyle(color: Palette.textSecondaryColor),
-                    ),
-                    leading:
-                        Icon(Icons.calendar_today, color: Palette.primaryColor),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: 3, // Placeholder untuk jumlah produk
+                    itemBuilder: (ctx, i) => Card(
+                      color: Palette.secondaryColor,
+                      child: ListTile(
+                        title: Text(
+                          'Produk ${i + 1}',
+                          style: TextStyle(color: Palette.textPrimaryColor),
+                        ),
+                        subtitle: Text(
+                          'Kadaluarsa: 2024-09-10',
+                          style: TextStyle(color: Palette.textSecondaryColor),
+                        ),
+                        leading: Icon(Icons.calendar_today,
+                            color: Palette.primaryColor),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
