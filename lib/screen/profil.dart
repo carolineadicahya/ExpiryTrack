@@ -1,5 +1,5 @@
-import 'package:expiry_track/screen/login.dart';
 import 'package:flutter/material.dart';
+import 'package:expiry_track/utils/palette.dart'; // Assuming this contains your color palette
 
 class Profil extends StatefulWidget {
   @override
@@ -11,34 +11,61 @@ class _ProfilState extends State<Profil> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profil'),
+        title: Text(
+          'Profil',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Palette.textPrimaryColor,
+          ),
+        ),
         centerTitle: true,
-        titleTextStyle: TextStyle(fontWeight: FontWeight.bold),
+        backgroundColor: Palette.primaryColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              'Nama: John Doe',
-              style: TextStyle(fontSize: 18),
+            // Ikon profil pengguna
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage(
+                  'assets/images/profile_picture.png'), // Example profile picture
+              backgroundColor: Palette.secondaryColor,
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             Text(
-              'Email: johndoe@example.com',
-              style: TextStyle(fontSize: 18),
+              'John Doe',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Palette.textPrimaryColor,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'johndoe@example.com',
+              style: TextStyle(
+                fontSize: 16,
+                color: Palette.textSecondaryColor,
+              ),
             ),
             SizedBox(height: 30),
-            ElevatedButton(
+            Divider(
+              color: Palette.textSecondaryColor,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton.icon(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => Login(),
-                  ),
-                );
+                Navigator.of(context).pushNamed('/login');
               },
-              child: Text('Logout'),
+              icon: Icon(Icons.logout),
+              label: Text('Logout'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Palette.errorColor,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                textStyle: TextStyle(fontSize: 18),
+              ),
             ),
           ],
         ),

@@ -5,11 +5,11 @@ import 'package:expiry_track/screen/navbar.dart';
 import 'package:expiry_track/screen/product.dart';
 import 'package:expiry_track/screen/profil.dart';
 import 'package:expiry_track/screen/regist.dart';
+// import 'package:expiry_track/screen/unavailable.dart';
 import 'package:flutter/material.dart';
 import 'package:expiry_track/screen/main_menu.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:expiry_track/utils/palette.dart';
-// import 'package:expiry_track/screen/login.dart'; // Tambahkan file login jika ada
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +25,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Palette.primaryColor,
         scaffoldBackgroundColor: Palette.scaffoldBackgroundColor,
-        textTheme: GoogleFonts.montserratTextTheme(),
+        textTheme: GoogleFonts.montserratTextTheme(
+          Theme.of(context).textTheme.copyWith(
+                bodyText1:
+                    TextStyle(fontWeight: FontWeight.w400), // Apply weight 500
+                headline1:
+                    TextStyle(fontWeight: FontWeight.w700), // Apply weight 500
+              ),
+        ),
       ),
       initialRoute: "/",
       onGenerateRoute: _onGenerateRoute,
@@ -36,10 +43,6 @@ class MyApp extends StatelessWidget {
 
 Route<dynamic> _onGenerateRoute(RouteSettings settings) {
   switch (settings.name) {
-    case "/":
-      return MaterialPageRoute(builder: (BuildContext context) {
-        return const Navbar();
-      });
     case "/login":
       return MaterialPageRoute(builder: (BuildContext context) {
         return Login();
@@ -47,6 +50,10 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     case "/regist":
       return MaterialPageRoute(builder: (BuildContext context) {
         return Regist();
+      });
+    case "/navbar":
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return Navbar();
       });
     case "/main_menu":
       return MaterialPageRoute(builder: (BuildContext context) {
@@ -70,7 +77,7 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return HomePage(); // Ganti dengan halaman yang sesuai
+        return Login(); // Ganti dengan halaman yang sesuai
       });
   }
 }
