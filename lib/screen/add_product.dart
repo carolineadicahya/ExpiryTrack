@@ -1,3 +1,4 @@
+import 'package:expiry_track/widgets/sneakybar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,7 +19,10 @@ class _AddProductState extends State<AddProduct> {
     'Elektronik',
     'Obat Jamu'
   ];
+
+  TextEditingController _productNameController = TextEditingController();
   TextEditingController _expirationDateController = TextEditingController();
+  TextEditingController _productionPTController = TextEditingController();
 
   Future<void> _scanBarcode() async {
     try {
@@ -76,12 +80,15 @@ class _AddProductState extends State<AddProduct> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Tambahkan Produk'),
-        centerTitle: true,
+        centerTitle: false,
         titleTextStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Palette.textPrimaryColor,
+          // fontWeight: FontWeight.bold,
+          fontSize: 18,
+          fontStyle: FontStyle.italic,
+          color: Palette.scaffoldBackgroundColor,
         ),
         backgroundColor: Palette.primaryColor,
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -89,6 +96,7 @@ class _AddProductState extends State<AddProduct> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
+              controller: _productNameController,
               decoration: InputDecoration(
                 labelText: 'Nama Produk',
                 labelStyle: TextStyle(color: Palette.textSecondaryColor),
@@ -144,11 +152,45 @@ class _AddProductState extends State<AddProduct> {
               ),
               onTap: () => _selectExpirationDate(context),
             ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: _productionPTController,
+              decoration: InputDecoration(
+                labelText: 'PT Produksi',
+                labelStyle: TextStyle(color: Palette.textSecondaryColor),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Palette.secondaryColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Palette.primaryColor),
+                ),
+              ),
+            ),
             SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Implement save functionality
+                  if (_productNameController.text.isNotEmpty &&
+                      _expirationDateController.text.isNotEmpty &&
+                      _productionPTController.text.isNotEmpty) {
+                    // Panggil fungsi onSaveProduct untuk menyimpan produk
+                    // widget.onSaveProduct({
+                    //   'name': _productNameController.text,
+                    //   'expiryDate': _expirationDateController.text,
+                    //   'category': selectedCategory,
+                    //   'production': _productionPTController.text,
+                    // });
+
+                    // Menampilkan SneakyBar
+                    SneakyBar(context, "Produk berhasil ditambahkan!");
+
+                    // Reset form setelah penyimpanan
+                    _productNameController.clear();
+                    _expirationDateController.clear();
+                    _productionPTController.clear();
+                  } else {
+                    SneakyBar(context, "Tolong diisi dengan lengkap!");
+                  }
                 },
                 child: Text('Simpan Produk'),
                 style: ElevatedButton.styleFrom(

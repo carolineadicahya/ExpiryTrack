@@ -21,16 +21,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'ExpiryTrack',
       theme: ThemeData(
         primaryColor: Palette.primaryColor,
         scaffoldBackgroundColor: Palette.scaffoldBackgroundColor,
-        textTheme: GoogleFonts.montserratTextTheme(
+        textTheme: GoogleFonts.inriaSansTextTheme(
           Theme.of(context).textTheme.copyWith(
-                bodyText1:
-                    TextStyle(fontWeight: FontWeight.w400), // Apply weight 500
-                headline1:
-                    TextStyle(fontWeight: FontWeight.w700), // Apply weight 500
+                bodyText1: TextStyle(fontWeight: FontWeight.w400),
+                headline1: TextStyle(fontWeight: FontWeight.w700),
               ),
         ),
       ),

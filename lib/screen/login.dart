@@ -1,5 +1,6 @@
 import 'package:expiry_track/utils/palette.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -11,21 +12,27 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text('Login'),
-        centerTitle: true,
-        backgroundColor: Palette.primaryColor,
-        titleTextStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Palette.textPrimaryColor,
-        ),
-      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                'Login',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Palette.textPrimaryColor,
+                ),
+              ),
+              Image.asset(
+                'images/regist.png',
+                height: 200,
+                width: 200,
+              ),
+              SizedBox(height: 20),
+              // Input Email
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -40,6 +47,7 @@ class _LoginState extends State<Login> {
                 cursorColor: Palette.primaryColor,
               ),
               SizedBox(height: 16),
+              // Input Password
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Password',
@@ -55,6 +63,29 @@ class _LoginState extends State<Login> {
                 cursorColor: Palette.primaryColor,
               ),
               SizedBox(height: 20),
+              // Baris untuk "Forgot Password?" di sebelah kanan
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      text: 'Forgot Password?',
+                      style: TextStyle(
+                        color: Palette.primaryColor,
+                        fontSize: 12,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          // Implementasi ketika teks di-tap
+                          Navigator.of(context).pushNamed('/forgot_password');
+                        },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              // Tombol Login
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primaryColor,
@@ -69,13 +100,30 @@ class _LoginState extends State<Login> {
                 ),
               ),
               SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/regist');
-                },
-                child: Text(
-                  'Don\'t have an account? Register',
-                  style: TextStyle(color: Palette.accentColor),
+              // Tautan untuk pendaftaran
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Don\'t have an account? ',
+                      style: TextStyle(
+                        color: Palette.textPrimaryColor,
+                        fontSize: 16,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Register',
+                      style: TextStyle(
+                        color: Palette.accentColor,
+                        fontSize: 16,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.of(context).pushNamed('/regist');
+                        },
+                    ),
+                  ],
                 ),
               ),
             ],

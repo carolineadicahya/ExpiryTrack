@@ -33,15 +33,19 @@ class _ProductState extends State<Product> {
         title: Text(
           'Produk',
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Palette.textPrimaryColor,
+            // fontWeight: FontWeight.bold,
+            fontSize: 18,
+            fontStyle: FontStyle.italic,
+            color: Palette.scaffoldBackgroundColor,
           ),
         ),
-        centerTitle: true,
+        elevation: 0,
         backgroundColor: Palette.primaryColor,
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(
+              Icons.search_rounded,
+            ),
             onPressed: () {
               // Implement search functionality
               showSearch(
@@ -51,7 +55,9 @@ class _ProductState extends State<Product> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.filter_list),
+            icon: Icon(
+              Icons.filter_list_rounded,
+            ),
             onPressed: () {
               // Implement filter functionality
               _showFilterDialog();
@@ -156,9 +162,12 @@ class ProductSearch extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.arrow_back),
+      icon: Icon(
+        Icons.arrow_back,
+        // color: Palette.primaryColor,
+      ),
       onPressed: () {
-        close(context, '');
+        Navigator.of(context).pushNamed('/main_menu');
       },
     );
   }

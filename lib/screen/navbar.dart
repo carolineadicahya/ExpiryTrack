@@ -34,20 +34,21 @@ class _NavbarState extends State<Navbar> {
       body: _widget_options[selected_index],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.add_rounded), label: ""),
           BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded), label: "Main Menu"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add_rounded), label: "Tambahkan Produk"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_bag_rounded), label: "Produk"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle), label: "Profil"),
+              icon: Icon(Icons.shopping_bag_rounded), label: ""),
+          BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: ""),
         ],
         currentIndex: selected_index,
         onTap: on_itemTapped,
         // backgroundColor: Colors.deepPurple, // Warna latar belakang navbar
         selectedItemColor: Palette.primaryColor, // Warna item yang dipilih
         unselectedItemColor: Colors.black12, // Warna item yang tidak dipilih
+        showSelectedLabels:
+            false, // Menyembunyikan label untuk item yang dipilih
+        showUnselectedLabels: false,
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }

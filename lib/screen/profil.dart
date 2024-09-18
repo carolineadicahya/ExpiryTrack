@@ -1,5 +1,6 @@
+import 'package:expiry_track/widgets/sneakybar.dart';
 import 'package:flutter/material.dart';
-import 'package:expiry_track/utils/palette.dart'; // Assuming this contains your color palette
+import 'package:expiry_track/utils/palette.dart';
 
 class Profil extends StatefulWidget {
   @override
@@ -7,19 +8,46 @@ class Profil extends StatefulWidget {
 }
 
 class _ProfilState extends State<Profil> {
+  final TextEditingController _nameController =
+      TextEditingController(text: 'John Doe');
+  final String _email = 'johndoe@example.com';
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _saveChanges() {
+    // Logika untuk menyimpan nama baru
+    String newName = _nameController.text;
+    // Simulasi penyimpanan
+    print('Nama baru: $newName');
+    // Tampilkan SneakyBar
+    SneakyBar(context, 'Nama berhasil diperbarui');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Profil',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Palette.textPrimaryColor,
-          ),
+        title: Text('Profil'),
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          fontSize: 18,
+          fontStyle: FontStyle.italic,
+          color: Palette.scaffoldBackgroundColor,
         ),
-        centerTitle: true,
         backgroundColor: Palette.primaryColor,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout_rounded),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/login');
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,13 +57,23 @@ class _ProfilState extends State<Profil> {
             // Ikon profil pengguna
             CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage(
-                  'assets/images/profile_picture.png'), // Example profile picture
+              backgroundImage: AssetImage('images/profile.png'),
               backgroundColor: Palette.secondaryColor,
             ),
             SizedBox(height: 20),
-            Text(
-              'John Doe',
+            // Nama pengguna dengan TextEditingController
+            TextFormField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Nama',
+                labelStyle: TextStyle(color: Palette.textSecondaryColor),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Palette.secondaryColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Palette.primaryColor),
+                ),
+              ),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -43,8 +81,9 @@ class _ProfilState extends State<Profil> {
               ),
             ),
             SizedBox(height: 8),
+            // Email pengguna sebagai Text
             Text(
-              'johndoe@example.com',
+              'Email: $_email',
               style: TextStyle(
                 fontSize: 16,
                 color: Palette.textSecondaryColor,
@@ -55,16 +94,12 @@ class _ProfilState extends State<Profil> {
               color: Palette.textSecondaryColor,
             ),
             SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/login');
-              },
-              icon: Icon(Icons.logout),
-              label: Text('Logout'),
+            // Tombol simpan perubahan
+            ElevatedButton(
+              onPressed: _saveChanges,
+              child: Text('Simpan Perubahan'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Palette.errorColor,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                textStyle: TextStyle(fontSize: 18),
+                primary: Palette.primaryColor,
               ),
             ),
           ],

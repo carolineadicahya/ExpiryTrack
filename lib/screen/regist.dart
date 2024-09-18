@@ -11,15 +11,6 @@ class _RegistState extends State<Regist> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Palette.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text('Register'),
-        centerTitle: true,
-        backgroundColor: Palette.primaryColor,
-        titleTextStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Palette.textPrimaryColor,
-        ),
-      ),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -27,6 +18,20 @@ class _RegistState extends State<Regist> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Text(
+                  'Registration',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Palette.textPrimaryColor,
+                  ),
+                ),
+                Image.asset(
+                  'images/regist.png',
+                  height: 200,
+                  width: 200,
+                ),
+                SizedBox(height: 20),
                 TextField(
                   decoration: InputDecoration(
                     labelText: 'Name',
@@ -58,6 +63,21 @@ class _RegistState extends State<Regist> {
                 TextField(
                   decoration: InputDecoration(
                     labelText: 'Password',
+                    labelStyle: TextStyle(color: Palette.textSecondaryColor),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Palette.secondaryColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Palette.primaryColor),
+                    ),
+                  ),
+                  obscureText: true,
+                  cursorColor: Palette.primaryColor,
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
                     labelStyle: TextStyle(color: Palette.textSecondaryColor),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Palette.secondaryColor),
