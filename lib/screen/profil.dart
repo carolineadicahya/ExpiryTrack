@@ -57,7 +57,7 @@ class _ProfilState extends State<Profil> {
             // Ikon profil pengguna
             CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('images/profile.png'),
+              backgroundImage: AssetImage('assets/images/profile.png'),
               backgroundColor: Palette.secondaryColor,
             ),
             SizedBox(height: 20),

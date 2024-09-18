@@ -26,10 +26,11 @@ class _LoginState extends State<Login> {
                   color: Palette.textPrimaryColor,
                 ),
               ),
+              SizedBox(height: 10),
               Image.asset(
-                'images/regist.png',
-                height: 200,
-                width: 200,
+                'assets/images/login.png',
+                height: 300,
+                width: 300,
               ),
               SizedBox(height: 20),
               // Input Email

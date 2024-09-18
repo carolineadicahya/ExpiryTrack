@@ -26,10 +26,11 @@ class _RegistState extends State<Regist> {
                     color: Palette.textPrimaryColor,
                   ),
                 ),
+                SizedBox(height: 10),
                 Image.asset(
-                  'images/regist.png',
-                  height: 200,
-                  width: 200,
+                  'assets/images/regist.png',
+                  height: 300,
+                  width: 300,
                 ),
                 SizedBox(height: 20),
                 TextField(
