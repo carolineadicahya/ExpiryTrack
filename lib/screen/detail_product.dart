@@ -76,7 +76,7 @@ class _ProductDetailState extends State<ProductDetail> {
               child: CircleAvatar(
                 radius: 60,
                 backgroundImage: AssetImage(
-                    '/images/product.png'), // Ganti dengan gambar produk
+                    'assets/images/product.png'), // Ganti dengan gambar produk
                 backgroundColor: Palette.secondaryColor,
               ),
             ),

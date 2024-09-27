@@ -1,3 +1,4 @@
+import 'package:expiry_track/widgets/categories.dart';
 import 'package:flutter/material.dart';
 import 'package:expiry_track/utils/palette.dart'; // Import palette untuk warna yang konsisten
 
@@ -9,20 +10,12 @@ class Product extends StatefulWidget {
 class _ProductState extends State<Product> {
   String _selectedCategory = 'Semua'; // Kategori default
 
-  final List<String> _categories = [
-    'Semua',
-    'Makanan',
-    'Minuman',
-    'Elektronik',
-    'Obat Jamu'
-  ];
-
   final List<Map<String, String>> _products = List.generate(
     10,
     (index) => {
       'name': 'Produk ${index + 1}',
       'expiryDate': '2024-09-10',
-      'category': ['Makanan', 'Minuman', 'Elektronik', 'Obat Jamu'][index % 4],
+      'category': Categories.categories[index % Categories.categories.length],
     },
   );
 
@@ -54,44 +47,51 @@ class _ProductState extends State<Product> {
               );
             },
           ),
-          IconButton(
-            icon: Icon(
-              Icons.filter_list_rounded,
-            ),
-            onPressed: () {
-              // Implement filter functionality
-              _showFilterDialog();
-            },
-          ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: _filteredProducts().length,
-        itemBuilder: (ctx, i) => Card(
-          margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Palette.primaryColor,
-              child: Text('${i + 1}'),
-            ),
-            title: Text(
-              _filteredProducts()[i]['name']!,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Palette.textPrimaryColor,
-              ),
-            ),
-            subtitle: Text(
-              'Kadaluarsa: ${_filteredProducts()[i]['expiryDate']}',
-              style: TextStyle(color: Palette.textSecondaryColor),
-            ),
-            trailing:
-                Icon(Icons.arrow_forward_ios, color: Palette.primaryColor),
-            onTap: () {
-              Navigator.of(context).pushNamed('/product_detail');
+      body: Column(
+        children: [
+          SizedBox(height: 16),
+          Categories(
+            currentCat: _selectedCategory,
+            onCategorySelected: (category) {
+              setState(() {
+                _selectedCategory = category; // Update kategori yang dipilih
+              });
             },
           ),
-        ),
+          SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _filteredProducts().length,
+              itemBuilder: (ctx, i) => Card(
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Palette.primaryColor,
+                    child: Text('${i + 1}'),
+                  ),
+                  title: Text(
+                    _filteredProducts()[i]['name']!,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Palette.textPrimaryColor,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Kadaluarsa: ${_filteredProducts()[i]['expiryDate']}',
+                    style: TextStyle(color: Palette.textSecondaryColor),
+                  ),
+                  trailing: Icon(Icons.arrow_forward_ios,
+                      color: Palette.primaryColor),
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/product_detail');
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -103,42 +103,6 @@ class _ProductState extends State<Product> {
     return _products
         .where((product) => product['category'] == _selectedCategory)
         .toList();
-  }
-
-  // Dialog filter produk
-  void _showFilterDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Filter Produk'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: _categories.map((category) {
-              return RadioListTile<String>(
-                title: Text(category),
-                value: category,
-                groupValue: _selectedCategory,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCategory = value!;
-                  });
-                  Navigator.of(context).pop(); // Tutup dialog setelah memilih
-                },
-              );
-            }).toList(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Tutup'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
 
@@ -167,7 +131,7 @@ class ProductSearch extends SearchDelegate<String> {
         // color: Palette.primaryColor,
       ),
       onPressed: () {
-        Navigator.of(context).pushNamed('/main_menu');
+        Navigator.of(context).pushNamed('/navbar');
       },
     );
   }
