@@ -1,10 +1,14 @@
 import 'package:expiry_track/screen/add_product.dart';
+import 'package:flutter/services.dart';
+// import 'package:expiry_track/screen/coffee_order.dart';
 import 'package:expiry_track/screen/detail_product.dart';
+import 'package:expiry_track/screen/forgot_password.dart';
 import 'package:expiry_track/screen/login.dart';
-import 'package:expiry_track/screen/navbar.dart';
+import 'package:expiry_track/widgets/navbar.dart';
 import 'package:expiry_track/screen/product.dart';
 import 'package:expiry_track/screen/profil.dart';
 import 'package:expiry_track/screen/regist.dart';
+import 'package:expiry_track/screen/splash.dart';
 // import 'package:expiry_track/screen/unavailable.dart';
 import 'package:flutter/material.dart';
 import 'package:expiry_track/screen/main_menu.dart';
@@ -20,22 +24,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ExpiryTrack',
+      home: const SplashScreen(),
       theme: ThemeData(
         primaryColor: Palette.primaryColor,
         scaffoldBackgroundColor: Palette.scaffoldBackgroundColor,
-        textTheme: GoogleFonts.inriaSansTextTheme(
-          Theme.of(context).textTheme.copyWith(
-                bodyText1: TextStyle(fontWeight: FontWeight.w400),
-                headline1: TextStyle(fontWeight: FontWeight.w700),
-              ),
-        ),
+        textTheme: GoogleFonts.interTextTheme(),
       ),
       initialRoute: "/",
       onGenerateRoute: _onGenerateRoute,
-      // routes: {'/': (context) => Login()},
     );
   }
 }
@@ -49,6 +52,10 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     case "/regist":
       return MaterialPageRoute(builder: (BuildContext context) {
         return Regist();
+      });
+    case "/reset_password":
+      return MaterialPageRoute(builder: (BuildContext context) {
+        return ForgotPass();
       });
     case "/navbar":
       return MaterialPageRoute(builder: (BuildContext context) {
@@ -77,6 +84,7 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     default:
       return MaterialPageRoute(builder: (BuildContext context) {
         return Login(); // Ganti dengan halaman yang sesuai
+        // return CoffeeOrderPage();
       });
   }
 }
