@@ -44,11 +44,11 @@ class _ProfilState extends State<Profil> {
     });
 
     // Simulate a delay for saving data
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
 
     String newName = _nameController.text;
     print('Nama baru: $newName');
-    SneakyBar(context, 'Nama berhasil diperbarui');
+    sneakyBar(context, 'Nama berhasil diperbarui');
     _toggleEdit();
 
     setState(() {

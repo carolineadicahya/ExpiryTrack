@@ -70,9 +70,10 @@ class _AddProductState extends State<AddProduct> {
   }
 
   Future<void> _openProductDetails(String barcode) async {
-    final url = 'https://www.google.com/search?q=$barcode';
-    if (await canLaunch(url)) {
-      await launch(url);
+    final Uri url = Uri.parse('https://www.google.com/search?q=$barcode');
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     } else {
       throw 'Could not launch $url';
     }
@@ -269,7 +270,7 @@ class _AddProductState extends State<AddProduct> {
                           _barcodeController.text.isNotEmpty &&
                           _image != null) {
                         // Cek jika gambar sudah diupload
-                        SneakyBar(context, "Produk berhasil ditambahkan!");
+                        sneakyBar(context, "Produk berhasil ditambahkan!");
                         // Reset form setelah penyimpanan
                         _productNameController.clear();
                         _expirationDateController.clear();
@@ -278,7 +279,7 @@ class _AddProductState extends State<AddProduct> {
                           _image = null; // Reset gambar
                         });
                       } else {
-                        SneakyBar(context, "Tolong diisi dengan lengkap!");
+                        sneakyBar(context, "Tolong diisi dengan lengkap!");
                       }
                     },
                     icon: Icon(CupertinoIcons.tray_arrow_down),

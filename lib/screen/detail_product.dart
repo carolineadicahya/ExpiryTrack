@@ -78,9 +78,9 @@ class _ProductDetailState extends State<ProductDetail> {
   }
 
   Future<void> _openProductDetails(String barcode) async {
-    final url = 'https://www.google.com/search?q=$barcode';
-    if (await canLaunch(url)) {
-      await launch(url);
+    final Uri url = Uri.parse('https://www.google.com/search?q=$barcode');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     } else {
       throw 'Could not launch $url';
     }
@@ -95,7 +95,7 @@ class _ProductDetailState extends State<ProductDetail> {
   void _saveChanges() {
     // Implement saving changes functionality
     print('Menyimpan perubahan');
-    SneakyBar(context, 'Produk berhasil diperbarui');
+    sneakyBar(context, 'Produk berhasil diperbarui');
     _toggleEditMode();
   }
 

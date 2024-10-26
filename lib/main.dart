@@ -15,7 +15,14 @@ import 'package:expiry_track/screen/main_menu.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:expiry_track/utils/palette.dart';
 
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -47,11 +54,11 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
   switch (settings.name) {
     case "/login":
       return MaterialPageRoute(builder: (BuildContext context) {
-        return Login();
+        return const Login();
       });
     case "/regist":
       return MaterialPageRoute(builder: (BuildContext context) {
-        return Regist();
+        return const Regist();
       });
     case "/reset_password":
       return MaterialPageRoute(builder: (BuildContext context) {
@@ -59,7 +66,7 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
       });
     case "/navbar":
       return MaterialPageRoute(builder: (BuildContext context) {
-        return Navbar();
+        return const Navbar();
       });
     case "/main_menu":
       return MaterialPageRoute(builder: (BuildContext context) {
@@ -83,7 +90,7 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
       });
     default:
       return MaterialPageRoute(builder: (BuildContext context) {
-        return Login(); // Ganti dengan halaman yang sesuai
+        return const Login(); // Ganti dengan halaman yang sesuai
         // return CoffeeOrderPage();
       });
   }

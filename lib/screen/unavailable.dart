@@ -10,7 +10,7 @@ class Unavailable extends StatefulWidget {
 class _UnavailableState extends State<Unavailable> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: Text(
           'Tidak ada data',

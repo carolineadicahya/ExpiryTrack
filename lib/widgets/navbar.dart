@@ -14,31 +14,31 @@ class Navbar extends StatefulWidget {
 }
 
 class _NavbarState extends State<Navbar> {
-  int selected_index = 0;
+  int selectedIndex = 0;
 
-  final List<Widget> _widget_options = <Widget>[
+  final List<Widget> widgetOptions = <Widget>[
     HomePage(),
     AddProduct(),
     Product(),
     Profil()
   ];
 
-  void on_itemTapped(int index) {
+  void onitemTapped(int index) {
     setState(() {
-      selected_index = index;
+      selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _widget_options[selected_index],
+      body: widgetOptions[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         // backgroundColor: Color(0xFFD1E9F6),
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(
-                selected_index == 0
+                selectedIndex == 0
                     ? CupertinoIcons.house_fill
                     : CupertinoIcons.house,
                 size: 30),
@@ -46,7 +46,7 @@ class _NavbarState extends State<Navbar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-                selected_index == 1
+                selectedIndex == 1
                     ? CupertinoIcons.add_circled_solid
                     : CupertinoIcons.add,
                 size: 30),
@@ -54,7 +54,7 @@ class _NavbarState extends State<Navbar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-                selected_index == 2
+                selectedIndex == 2
                     ? CupertinoIcons.bag_fill
                     : CupertinoIcons.bag,
                 size: 30),
@@ -62,15 +62,15 @@ class _NavbarState extends State<Navbar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-                selected_index == 3
+                selectedIndex == 3
                     ? CupertinoIcons.person_fill
                     : CupertinoIcons.person,
                 size: 30),
             label: "",
           ),
         ],
-        currentIndex: selected_index,
-        onTap: on_itemTapped,
+        currentIndex: selectedIndex,
+        onTap: onitemTapped,
         selectedItemColor: Palette.primaryColor, // Color for selected item
         // selectedItemColor: Palette.accentColor, // Color for selected item
         unselectedItemColor: Colors.black12, // Color for unselected items
