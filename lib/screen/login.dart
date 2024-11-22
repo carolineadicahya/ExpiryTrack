@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expiry_track/utils/palette.dart';
+import 'package:expiry_track/widgets/sneakybar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +14,101 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final db = FirebaseFirestore.instance;
+  final User? user = FirebaseAuth.instance.currentUser;
+
   bool _passObscure = true;
+  bool _isLoading = false;
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void signIn() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      sneakyBar(context, 'Tolong isi dengan lengkap.');
+      return;
+    }
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      // Attempt to sign in
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // Memeriksa apakah email terverifikasi
+      if (userCredential.user!.emailVerified) {
+        Navigator.of(context).pushNamed('/navbar');
+      } else {
+        // Jika email belum terverifikasi
+        _showAlertDialog(
+          "Verifikasi Email",
+          "Email untuk verifikasi akun telah dikirim ke alamat yang anda daftarkan. Silakan periksa akun email anda.",
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        _showAlertDialog(
+          'Akun sudah ada',
+          'Email ini sudah terdaftar. Silakan gunakan email lain atau masuk dengan email ini.',
+        );
+      } else if (e.code == 'invalid-email') {
+        _showAlertDialog(
+          'Akun Tidak Valid',
+          'Silakan gunakan alamat email dengan format yang benar (Contoh: pengguna@gmail.com).',
+        );
+      } else {
+        _showAlertDialog(
+          'Terjadi Kesalahan',
+          'Mohon perhatikan kembali dan perbaiki data yang anda masukkan.',
+        );
+      }
+
+      print('Kesalahan saat mendaftar: ${e.code}');
+    }
+  }
+
+// Menampilkan dialog kustom dengan gaya sesuai keinginan
+  void _showAlertDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Menutup dialog
+              },
+              child: Text(
+                'Tutup',
+                style: TextStyle(
+                  color: Palette.errorColor, // Warna tombol sesuai tema
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +246,7 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.of(context).pushNamed('/navbar');
+                          signIn();
                         },
                         child: Text(
                           'Login',

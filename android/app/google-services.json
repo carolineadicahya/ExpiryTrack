@@ -1,13 +1,32 @@
 {
   "project_info": {
-    "project_number": "990393978427",
-    "project_id": "expiry-track-efba5",
-    "storage_bucket": "expiry-track-efba5.appspot.com"
+    "project_number": "474241887532",
+    "project_id": "flutter-chat-app-12e20",
+    "storage_bucket": "flutter-chat-app-12e20.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:990393978427:android:8e7f4dc2a5214dd991961e",
+        "mobilesdk_app_id": "1:474241887532:android:ac06d64d47a23ca8b01089",
+        "android_client_info": {
+          "package_name": "com.example.chat_app_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfNEkcBKVvXl7CbNPcHn4uM5fUinG-m5I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:474241887532:android:511a4caef9c72791b01089",
         "android_client_info": {
           "package_name": "com.example.expiry_track"
         }
@@ -15,7 +34,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAHb_9KnU_XLOPLcr2uK1U3txiBUMMcc94"
+          "current_key": "AIzaSyCfNEkcBKVvXl7CbNPcHn4uM5fUinG-m5I"
         }
       ],
       "services": {

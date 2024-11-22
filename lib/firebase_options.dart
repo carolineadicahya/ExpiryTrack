@@ -41,48 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyA_ffDC4Cf0MZDrqAQV2KgPXoRHZe4hIyc',
-    appId: '1:990393978427:web:92ca9d3b35111aa991961e',
-    messagingSenderId: '990393978427',
-    projectId: 'expiry-track-efba5',
-    authDomain: 'expiry-track-efba5.firebaseapp.com',
-    storageBucket: 'expiry-track-efba5.appspot.com',
-    measurementId: 'G-TPMHCK0BY2',
+    apiKey: 'AIzaSyCJN89Ftbt8MQdazk_glW_ujeLKIN1SrxI',
+    appId: '1:474241887532:web:0de8785b1de21fafb01089',
+    messagingSenderId: '474241887532',
+    projectId: 'flutter-chat-app-12e20',
+    authDomain: 'flutter-chat-app-12e20.firebaseapp.com',
+    storageBucket: 'flutter-chat-app-12e20.appspot.com',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAHb_9KnU_XLOPLcr2uK1U3txiBUMMcc94',
-    appId: '1:990393978427:android:8e7f4dc2a5214dd991961e',
-    messagingSenderId: '990393978427',
-    projectId: 'expiry-track-efba5',
-    storageBucket: 'expiry-track-efba5.appspot.com',
+    apiKey: 'AIzaSyCfNEkcBKVvXl7CbNPcHn4uM5fUinG-m5I',
+    appId: '1:474241887532:android:511a4caef9c72791b01089',
+    messagingSenderId: '474241887532',
+    projectId: 'flutter-chat-app-12e20',
+    storageBucket: 'flutter-chat-app-12e20.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAHK_IdYqeWzGS_S2OqbzrD9xYxxLSsuLo',
-    appId: '1:990393978427:ios:6825ee61e0b4843b91961e',
-    messagingSenderId: '990393978427',
-    projectId: 'expiry-track-efba5',
-    storageBucket: 'expiry-track-efba5.appspot.com',
+    apiKey: 'AIzaSyDEOEvUWEQRY0ZCYPuYPCmsIMkvD73q0tg',
+    appId: '1:474241887532:ios:747d954b23a5c9e9b01089',
+    messagingSenderId: '474241887532',
+    projectId: 'flutter-chat-app-12e20',
+    storageBucket: 'flutter-chat-app-12e20.appspot.com',
     iosBundleId: 'com.example.expiryTrack',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAHK_IdYqeWzGS_S2OqbzrD9xYxxLSsuLo',
-    appId: '1:990393978427:ios:6825ee61e0b4843b91961e',
-    messagingSenderId: '990393978427',
-    projectId: 'expiry-track-efba5',
-    storageBucket: 'expiry-track-efba5.appspot.com',
+    apiKey: 'AIzaSyDEOEvUWEQRY0ZCYPuYPCmsIMkvD73q0tg',
+    appId: '1:474241887532:ios:747d954b23a5c9e9b01089',
+    messagingSenderId: '474241887532',
+    projectId: 'flutter-chat-app-12e20',
+    storageBucket: 'flutter-chat-app-12e20.appspot.com',
     iosBundleId: 'com.example.expiryTrack',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyA_ffDC4Cf0MZDrqAQV2KgPXoRHZe4hIyc',
-    appId: '1:990393978427:web:bc78f720ca2fcaaa91961e',
-    messagingSenderId: '990393978427',
-    projectId: 'expiry-track-efba5',
-    authDomain: 'expiry-track-efba5.firebaseapp.com',
-    storageBucket: 'expiry-track-efba5.appspot.com',
-    measurementId: 'G-F11BV6KVXP',
+    apiKey: 'AIzaSyAr7ffVSwTLXMWfgaJ7S45aRHzLjipRpK8',
+    appId: '1:474241887532:web:37b6b165fddddf63b01089',
+    messagingSenderId: '474241887532',
+    projectId: 'flutter-chat-app-12e20',
+    authDomain: 'flutter-chat-app-12e20.firebaseapp.com',
+    storageBucket: 'flutter-chat-app-12e20.appspot.com',
   );
 }

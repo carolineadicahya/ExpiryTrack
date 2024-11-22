@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expiry_track/services/product_service.dart';
 import 'package:expiry_track/utils/palette.dart';
 import 'package:expiry_track/widgets/categories.dart';
 import 'package:expiry_track/widgets/sneakybar.dart';
@@ -9,28 +11,38 @@ import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart'; // Import untuk memilih gambar
 
 class ProductDetail extends StatefulWidget {
-  const ProductDetail({super.key});
+  const ProductDetail({Key? key, required this.id});
+  final String id;
 
   @override
   State<ProductDetail> createState() => _ProductDetailState();
 }
 
 class _ProductDetailState extends State<ProductDetail> {
+  final ProductService productService = ProductService();
+
   bool _isEditing = false;
-  final TextEditingController _nameController =
-      TextEditingController(text: 'Produk Contoh');
-  final TextEditingController _expiryDateController =
-      TextEditingController(text: '20/03/2024');
-  final TextEditingController _barcodeController =
-      TextEditingController(text: '123456789012');
-  String selectedCategory = "Makanan";
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _expiryDateController = TextEditingController();
+  final TextEditingController _barcodeController = TextEditingController();
+  String selectedCategory = "";
   File? _image; // Variabel untuk menyimpan gambar produk
   final ImagePicker _picker = ImagePicker(); // Instance dari ImagePicker
 
   // Controller untuk tanggal kadaluarsa baru
   List<TextEditingController> _newExpiryDateController = [];
-  List<String> _newExpiryDates =
-      []; // List untuk menyimpan tanggal kadaluarsa baru
+  List<String> _newExpiryDates = [];
+
+  // final ImagePicker _picker = ImagePicker();
+
+  // Future<void> _pickImage() async {
+  //   final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _image = File(pickedFile.path); // Mengatur gambar yang dipilih
+  //     });
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -92,11 +104,40 @@ class _ProductDetailState extends State<ProductDetail> {
     });
   }
 
-  void _saveChanges() {
-    // Implement saving changes functionality
-    print('Menyimpan perubahan');
-    sneakyBar(context, 'Produk berhasil diperbarui');
-    _toggleEditMode();
+  void _saveChanges() async {
+    try {
+      // Ambil tanggal kadaluarsa yang baru dari list _newExpiryDates
+      List<Timestamp> newExpiredDates = _newExpiryDates
+          .map((date) =>
+              Timestamp.fromDate(DateFormat('dd/MM/yyyy').parse(date)))
+          .toList();
+
+      // Ambil tanggal kadaluarsa utama dan gabungkan dengan tanggal baru
+      DateTime mainExpiryDate =
+          DateFormat('dd/MM/yyyy').parse(_expiryDateController.text);
+      List<Timestamp> allExpiredDates = [
+        Timestamp.fromDate(mainExpiryDate),
+        ...newExpiredDates
+      ];
+
+      // Update data produk di Firestore
+      await productService.updateProduct(
+        widget.id,
+        {
+          'name': _nameController.text,
+          'category': selectedCategory,
+          'barcode': _barcodeController.text,
+          'expired': allExpiredDates // Menyimpan daftar tanggal kadaluarsa baru
+        },
+      );
+
+      // Tampilkan pesan sukses
+      sneakyBar(context, 'Produk berhasil diperbarui');
+      _toggleEditMode();
+    } catch (e) {
+      print('Error updating product: $e');
+      sneakyBar(context, 'Terjadi kesalahan saat menyimpan perubahan');
+    }
   }
 
   Future<void> _pickImage() async {
@@ -122,50 +163,83 @@ class _ProductDetailState extends State<ProductDetail> {
         backgroundColor: Palette.primaryColor,
         elevation: 0,
       ),
-      body: Container(
-        color: Colors.white,
-        height: double.infinity,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Gambar produk
-                GestureDetector(
-                  onTap: _isEditing
-                      ? _pickImage
-                      : null, // Hanya bisa dipilih saat editing
-                  child: Container(
-                    width: double.infinity,
-                    height: 300,
-                    decoration: BoxDecoration(
-                      color: Palette.secondaryBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: _image == null
-                        ? Center(
-                            child: Image.asset('assets/images/product.png',
-                                fit: BoxFit.cover))
-                        : ClipRRect(
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: productService.getDetail(widget.id),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Something went wrong!'));
+          }
+
+          if (!snapshot.hasData || snapshot.data == null) {
+            return Center(child: Text('Produk tidak ditemukan'));
+          }
+
+          DocumentSnapshot item = snapshot.data!;
+          Timestamp timestamp = item['expired'];
+          DateTime expired = timestamp?.toDate() ?? DateTime.now();
+
+          String productName = item['name'] ?? '';
+          String category = item['category'] ?? '';
+          String barcode = item['barcode'] ?? '';
+
+          _nameController.text = productName;
+          selectedCategory = category;
+          _expiryDateController.text = DateFormat('dd/MM/yyyy').format(expired);
+          _barcodeController.text = barcode;
+
+          return Container(
+            color: Colors.white,
+            height: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Gambar produk
+                    GestureDetector(
+                      onTap: _isEditing
+                          ? _pickImage
+                          : null, // Hanya bisa dipilih saat editing
+                      child: Container(
+                          width: double.infinity,
+                          height: 300,
+                          decoration: BoxDecoration(
+                            color: Palette.secondaryBackgroundColor,
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.file(
-                              _image!,
-                              fit: BoxFit.cover,
-                            ),
                           ),
-                  ),
+                          child: (item['image'] != null &&
+                                  item['image'].isNotEmpty)
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    item['image'],
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : Center(
+                                  child: Image.asset(
+                                      'assets/images/product.png',
+                                      fit: BoxFit.cover))),
+                    ),
+                    const SizedBox(height: 15),
+                    _isEditing
+                        ? _buildEditableFields()
+                        : _buildReadOnlyFields(),
+                    const SizedBox(height: 15),
+                    const Divider(color: Palette.textSecondaryColor),
+                    const SizedBox(height: 15),
+                    _buildActionButtons(),
+                  ],
                 ),
-                const SizedBox(height: 15),
-                _isEditing ? _buildEditableFields() : _buildReadOnlyFields(),
-                const SizedBox(height: 15),
-                const Divider(color: Palette.textSecondaryColor),
-                const SizedBox(height: 15),
-                _buildActionButtons(),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -221,8 +295,6 @@ class _ProductDetailState extends State<ProductDetail> {
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Palette.primaryColor),
         ),
-        // labelStyle: TextStyle(color: Palette.textSecondaryColor),
-        // border: OutlineInputBorder(),
       ),
       style: TextStyle(color: Palette.textPrimaryColor),
     );
@@ -230,7 +302,7 @@ class _ProductDetailState extends State<ProductDetail> {
 
   Widget _buildCategoryDropdown() {
     return DropdownButtonFormField<String>(
-      value: selectedCategory,
+      value: selectedCategory.isEmpty ? null : selectedCategory,
       decoration: InputDecoration(
         labelText: 'Kategori',
         labelStyle: TextStyle(color: Palette.textSecondaryColor),
@@ -252,6 +324,7 @@ class _ProductDetailState extends State<ProductDetail> {
       onChanged: (String? newValue) {
         setState(() {
           selectedCategory = newValue!;
+          print('Selected category: $selectedCategory');
         });
       },
     );
@@ -323,7 +396,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    _buildReadOnlyText(_nameController.text),
+                    _buildReadOnlyText('${_nameController.text}'),
 
                     const SizedBox(height: 20),
                     // Category
@@ -335,7 +408,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    _buildReadOnlyText(selectedCategory),
+                    _buildReadOnlyText('$selectedCategory'),
 
                     const SizedBox(height: 20),
                     // Expiry date
@@ -384,7 +457,8 @@ class _ProductDetailState extends State<ProductDetail> {
 
                   // Barcode text
                   InkWell(
-                    onTap: () => _openProductDetails(_barcodeController.text),
+                    onTap: () =>
+                        _openProductDetails('${_barcodeController.text}'),
                     child: Text(
                       _barcodeController.text,
                       style: TextStyle(
@@ -418,7 +492,9 @@ class _ProductDetailState extends State<ProductDetail> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ElevatedButton.icon(
-          onPressed: _isEditing ? _saveChanges : _toggleEditMode,
+          onPressed: () {
+            _isEditing ? _saveChanges() : _toggleEditMode();
+          },
           icon: Icon(_isEditing
               ? CupertinoIcons.tray_arrow_down
               : CupertinoIcons.pencil_outline),

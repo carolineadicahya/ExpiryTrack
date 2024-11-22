@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:expiry_track/services/product_service.dart';
 import 'package:expiry_track/widgets/categories.dart';
 import 'package:expiry_track/widgets/sneakybar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -16,6 +20,9 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
+  final ProductService productService = ProductService();
+  final storageRef = FirebaseStorage.instance.ref();
+
   String barcode = "Tidak Diketahui";
   String selectedCategory = "Makanan";
 
@@ -23,11 +30,13 @@ class _AddProductState extends State<AddProduct> {
   TextEditingController _expirationDateController = TextEditingController();
   TextEditingController _barcodeController = TextEditingController();
 
+  DateTime? _expirationDate;
   File? _image; // Variabel untuk menyimpan gambar
 
   final ImagePicker _picker = ImagePicker(); // Instance dari ImagePicker
 
   Future<void> _pickImage() async {
+    // final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
@@ -91,7 +100,27 @@ class _AddProductState extends State<AddProduct> {
       setState(() {
         _expirationDateController.text =
             DateFormat('dd/MM/yyyy').format(picked);
+        _expirationDate = picked;
       });
+    }
+  }
+
+  void submit(BuildContext context, String urlImage) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    Map<String, dynamic> body = {
+      "image": urlImage,
+      "name": _productNameController.text,
+      "category": selectedCategory,
+      "expired":
+          _expirationDate != null ? Timestamp.fromDate(_expirationDate!) : null,
+      "barcode": _barcodeController.text,
+    };
+    print(body);
+    try {
+      await productService.addProduct(body);
+      Navigator.pop(context);
+    } catch (e) {
+      debugPrint('Kesalahan: $e');
     }
   }
 
@@ -176,7 +205,7 @@ class _AddProductState extends State<AddProduct> {
               ),
               SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: selectedCategory,
+                value: selectedCategory.isEmpty ? null : selectedCategory,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color.fromARGB(81, 183, 224, 255),
@@ -264,22 +293,29 @@ class _AddProductState extends State<AddProduct> {
                   ),
                   SizedBox(width: 10),
                   ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_productNameController.text.isNotEmpty &&
                           _expirationDateController.text.isNotEmpty &&
-                          _barcodeController.text.isNotEmpty &&
-                          _image != null) {
-                        // Cek jika gambar sudah diupload
-                        sneakyBar(context, "Produk berhasil ditambahkan!");
-                        // Reset form setelah penyimpanan
-                        _productNameController.clear();
-                        _expirationDateController.clear();
-                        _barcodeController.clear();
-                        setState(() {
-                          _image = null; // Reset gambar
-                        });
+                          _barcodeController.text.isNotEmpty) {
+                        try {
+                          String urlImage = "";
+                          if (_image != null) {
+                            // Upload gambar ke Firebase Storage dan dapatkan URL-nya
+                            final uploadTask = await storageRef
+                                .child(
+                                    'products/${DateTime.now().millisecondsSinceEpoch}.jpg')
+                                .putFile(_image!);
+                            urlImage = await uploadTask.ref.getDownloadURL();
+                          }
+
+                          // Panggil metode submit dengan URL gambar
+                          submit(context, urlImage);
+                          sneakyBar(context, "Produk berhasil ditambahkan!");
+                        } catch (e) {
+                          sneakyBar(context, "Gagal menambahkan produk: $e");
+                        }
                       } else {
-                        sneakyBar(context, "Tolong diisi dengan lengkap!");
+                        sneakyBar(context, "Tolong isi semua kolom!");
                       }
                     },
                     icon: Icon(CupertinoIcons.tray_arrow_down),
@@ -288,9 +324,6 @@ class _AddProductState extends State<AddProduct> {
                       backgroundColor: Palette.primaryColor,
                       padding:
                           EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                      // shape: RoundedRectangleBorder(
-                      //   borderRadius: BorderRadius.circular(12),
-                      // ),
                     ),
                   ),
                 ],

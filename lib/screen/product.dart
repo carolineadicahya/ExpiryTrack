@@ -1,7 +1,16 @@
+import 'dart:io';
+
+import 'package:expiry_track/screen/detail_product.dart';
+import 'package:expiry_track/services/product_service.dart';
 import 'package:expiry_track/widgets/categories.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:expiry_track/utils/palette.dart'; // Import palette untuk warna yang konsisten
+import 'package:expiry_track/utils/palette.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 
 class Product extends StatefulWidget {
   @override
@@ -9,6 +18,8 @@ class Product extends StatefulWidget {
 }
 
 class _ProductState extends State<Product> {
+  ProductService productService = ProductService();
+
   String _selectedCategory = 'Semua'; // Kategori default
 
   final List<Map<String, String>> _products = List.generate(
@@ -20,8 +31,33 @@ class _ProductState extends State<Product> {
     },
   );
 
+  String _formatDate(String date) {
+    try {
+      DateTime parsedDate = DateTime.parse(date);
+      return DateFormat('dd/MM/yyyy').format(parsedDate);
+    } catch (e) {
+      return date; // Jika format tidak valid, kembalikan tanggal asli
+    }
+  }
+
+  File? _image;
+  // final ImagePicker _picker = ImagePicker();
+
+  Future<String> _getImageUrl(String imagePath) async {
+    try {
+      final ref = FirebaseStorage.instance.ref().child(imagePath);
+      final url = await ref.getDownloadURL();
+      return url;
+    } catch (e) {
+      print('Error fetching image: $e');
+      return ''; // Return a default empty string or a placeholder image URL
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -66,42 +102,79 @@ class _ProductState extends State<Product> {
             ),
             SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: _filteredProducts().length,
-                itemBuilder: (ctx, i) => Card(
-                  elevation: 0,
-                  color: const Color.fromARGB(81, 183, 224, 255),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color: Palette.secondaryColor,
-                      width: 0.7,
-                    ),
-                  ),
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Palette.primaryColor,
-                      child: Text('${i + 1}'),
-                    ),
-                    title: Text(
-                      _filteredProducts()[i]['name']!,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Palette.textPrimaryColor,
-                      ),
-                    ),
-                    subtitle: Text(
-                      'Kadaluarsa: ${_filteredProducts()[i]['expiryDate']}',
-                      style: TextStyle(color: Palette.textSecondaryColor),
-                    ),
-                    trailing: Icon(Icons.arrow_forward_ios,
-                        color: Palette.accentColor),
-                    onTap: () {
-                      Navigator.of(context).pushNamed('/product_detail');
+              child: StreamBuilder<QuerySnapshot>(
+                stream: productService.getData(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: Text('Tidak ada produk tersedia.'));
+                  }
+
+                  // Filter produk berdasarkan kategori yang dipilih
+                  final filteredProducts = snapshot.data!.docs.where((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    return _selectedCategory == 'Semua' ||
+                        data['category'] == _selectedCategory;
+                  }).toList();
+
+                  return ListView.builder(
+                    itemCount: filteredProducts.length,
+                    itemBuilder: (ctx, i) {
+                      final productData =
+                          filteredProducts[i].data() as Map<String, dynamic>;
+
+                      return Card(
+                        elevation: 0,
+                        color: const Color.fromARGB(81, 183, 224, 255),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Palette.secondaryColor,
+                            width: 0.7,
+                          ),
+                        ),
+                        margin:
+                            EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: (productData['image'] != null &&
+                                    productData['image'].isNotEmpty)
+                                ? NetworkImage(
+                                    productData['image']) // Gambar dari URL
+                                : AssetImage('assets/images/product.png')
+                                    as ImageProvider,
+                            backgroundColor: Palette.secondaryBackgroundColor,
+                          ),
+                          title: Text(
+                            productData['name'] ?? 'Produk',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Palette.textPrimaryColor,
+                            ),
+                          ),
+                          subtitle: Text(
+                            productData['expired'] != null
+                                ? 'Kadaluarsa: ${(productData['expired'] as Timestamp).toDate()}'
+                                : 'Tanggal kadaluarsa tidak tersedia',
+                            style: TextStyle(color: Palette.textSecondaryColor),
+                          ),
+                          trailing: Icon(Icons.arrow_forward_ios,
+                              color: Palette.accentColor),
+                          onTap: () {
+                            final productId = filteredProducts[i]
+                                .id; // Mengambil ID dari snapshot
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ProductDetail(id: productId),
+                              ),
+                            );
+                          },
+                        ),
+                      );
                     },
-                  ),
-                ),
+                  );
+                },
               ),
             ),
           ],

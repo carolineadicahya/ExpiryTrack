@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expiry_track/widgets/sneakybar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:expiry_track/utils/palette.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,20 +15,91 @@ class Profil extends StatefulWidget {
 }
 
 class _ProfilState extends State<Profil> {
-  final TextEditingController _nameController =
-      TextEditingController(text: 'Carol');
-  final String _email = 'caroline@example.com';
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? user;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  final TextEditingController _nameController = TextEditingController();
+  late String _email = 'user@gmail.com'; // or any sensible default value
+  String _profilePictureUrl = '';
+
   bool _isSaving = false;
   bool _isEditing = false;
 
   File? _image;
-  final ImagePicker _picker = ImagePicker();
+  // final ImagePicker _picker = ImagePicker();
+
+  Future<String> _getImageUrl(String imagePath) async {
+    try {
+      final ref = FirebaseStorage.instance.ref().child(imagePath);
+      final url = await ref.getDownloadURL();
+      return url;
+    } catch (e) {
+      print('Error fetching image: $e');
+      return ''; // Return a default empty string or a placeholder image URL
+    }
+  }
 
   Future<void> _pickImage() async {
+    final _picker = ImagePicker();
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path); // Mengatur gambar yang dipilih
+      });
+
+      // Upload gambar ke Firebase Storage
+      try {
+        String fileName = pickedFile.name; // Dapatkan nama file dari pickedFile
+        Reference storageRef =
+            FirebaseStorage.instance.ref().child('profile_pics/$fileName');
+        UploadTask uploadTask = storageRef.putFile(_image!);
+
+        // Tunggu upload selesai
+        TaskSnapshot snapshot = await uploadTask;
+
+        // Dapatkan URL gambar yang baru di-upload
+        String imageUrl = await snapshot.ref.getDownloadURL();
+        print('Image URL: $imageUrl'); // Menambahkan log di sini
+
+        // Simpan URL gambar ke Firestore
+        await _firestore.collection('user').doc(user!.uid).update({
+          'profile_picture': imageUrl,
+        });
+
+        // Tampilkan success message
+        sneakyBar(context, 'Foto profil berhasil diperbarui');
+      } catch (e) {
+        sneakyBar(context, 'Gagal mengupload gambar: $e');
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    user = _auth.currentUser;
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    user = _auth.currentUser;
+
+    final profileData =
+        await _firestore.collection('user').doc(user!.uid).get();
+    if (profileData.exists) {
+      setState(() {
+        _nameController.text = profileData['name'] ?? 'User';
+        _email = profileData['email'] ??
+            'user@gmail.com'; // Use default if not found
+        _profilePictureUrl = profileData['profile_picture'] ?? '';
+        print('Profile picture URL: $_profilePictureUrl');
+      });
+    } else {
+      setState(() {
+        _nameController.text = 'User';
+        _email = 'user@gmail.com'; // Default value
+        _profilePictureUrl = profileData['profile_picture'] ?? '';
       });
     }
   }
@@ -44,10 +118,16 @@ class _ProfilState extends State<Profil> {
     });
 
     // Simulate a delay for saving data
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
 
     String newName = _nameController.text;
     print('Nama baru: $newName');
+
+    // Mengupdate nama di Firestore
+    await _firestore
+        .collection('user')
+        .doc(user!.uid)
+        .update({'name': newName});
     sneakyBar(context, 'Nama berhasil diperbarui');
     _toggleEdit();
 
@@ -62,8 +142,8 @@ class _ProfilState extends State<Profil> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text('Profil'),
-        titleTextStyle: TextStyle(
+        title: const Text('Profil'),
+        titleTextStyle: const TextStyle(
           fontSize: 18,
           fontStyle: FontStyle.italic,
           color: Palette.scaffoldBackgroundColor,
@@ -89,8 +169,8 @@ class _ProfilState extends State<Profil> {
             children: [
               CircleAvatar(
                 radius: 50,
-                backgroundImage: _image != null
-                    ? FileImage(_image!) // Display selected image
+                backgroundImage: (_profilePictureUrl.isNotEmpty)
+                    ? NetworkImage((_profilePictureUrl))
                     : AssetImage('assets/images/profile.png')
                         as ImageProvider, // Default image
                 backgroundColor: Palette.secondaryColor,

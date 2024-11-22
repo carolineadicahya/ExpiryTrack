@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
+      // DeviceOrientation.portraitDown,
     ]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -80,10 +80,10 @@ Route<dynamic> _onGenerateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (BuildContext context) {
         return Product();
       });
-    case "/product_detail":
-      return MaterialPageRoute(builder: (BuildContext context) {
-        return const ProductDetail();
-      });
+    // case "/product_detail":
+    //   return MaterialPageRoute(builder: (BuildContext context) {
+    //     return const ProductDetail(id: productId);
+    //   });
     case "/profil":
       return MaterialPageRoute(builder: (BuildContext context) {
         return Profil();
